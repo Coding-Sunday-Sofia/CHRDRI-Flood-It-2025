@@ -1,4 +1,4 @@
-/* clear && dotnet build && dotnet run */
+/* clear && astyle --style=java --indent=tab *.cs  && dotnet build && dotnet run */
 /* clear && astyle --recursive --style=java --indent=tab *.cs */
 
 class Tile {
@@ -135,19 +135,41 @@ class Board {
 		turn = 0;
 	}
 
-	private void flood(int w, int h, int color) {
+	private void flood(int x, int y, Tile current, Tile change) {
+		if(x < 0) {
+			return;
+		}
+		if(y < 0) {
+			return;
+		}
+		if(x >= Width) {
+			return;
+		}
+		if(y >= Height) {
+			return;
+		}
+
+		if(tiles[x][y] != current) {
+			return;
+		}
+
+		tiles[x][y] = change;
+		flood(x-1, y, current, change);
+		flood(x, y-1, current, change);
+		flood(x+1, y, current, change);
+		flood(x, y+1, current, change);
 	}
 
 	private bool play(char action) {
-		bool found = false;
+		Tile change = null;
 		foreach(Tile tile in colors) {
 			if(tile.Symbol == action) {
-				found = true;
+				change = tile;
 				break;
 			}
 		}
 
-		if(found == false) {
+		if(change == null) {
 			return false;
 		}
 
@@ -155,20 +177,20 @@ class Board {
 			return false;
 		}
 
-		if(action == tiles[0][0].Symbol) {
+		if(change == tiles[0][0]) {
 			return false;
 		}
 
-		if(action == tiles[Width-1][Height-1].Symbol) {
+		if(change == tiles[Width-1][Height-1]) {
 			return false;
 		}
 
 		switch(turn % players.Length) {
 		case 0:
-			flood(0, 0, action);
+			flood(0, 0, tiles[0][0], change);
 			break;
 		case 1:
-			flood(Width-1, Height-1, action);
+			flood(Width-1, Height-1, tiles[Width-1][Height-1], change);
 			break;
 		}
 
@@ -183,7 +205,7 @@ class Board {
 			show();
 			action = Console.ReadLine()[0];
 
-			if(action != 'q') {
+			if(action == 'q') {
 				break;
 			}
 
