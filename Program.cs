@@ -75,7 +75,7 @@ class Board {
 
 	private Tile[][] tiles = null;
 
-	private Player[] players = {new Player("Gosho"), new Player("Pesho")};
+	private Player[] players = null;
 
 	private int turn;
 
@@ -104,7 +104,7 @@ class Board {
 		Console.Write(this + " ");
 	}
 
-	public Board(int width, int height) {
+	public Board(int width, int height, string[] names) {
 		Width = width;
 		Height = height;
 		tiles = new Tile[Width][];
@@ -115,6 +115,10 @@ class Board {
 			for(int h=0; h<Height; h++) {
 				tiles[w][h] = colors[0];
 			}
+		}
+		players = new Player[ names.Length ];
+		for(int p=0; p<players.Length; p++) {
+			players[p] = new Player( names[p] );
 		}
 		turn = 0;
 	}
@@ -244,7 +248,7 @@ class Board {
 			}
 		}
 		result += "\n";
-		result += "Player " + players[ turn%players.Length ] + " turn: ";
+		result += "Player " + players[ turn%players.Length ] + " turn ("+turn+"): ";
 
 		return result.Trim();
 	}
@@ -252,7 +256,17 @@ class Board {
 
 public class Program {
 	public static void Main(string[] args) {
-		Board board = new Board(13,7);
+		Console.Write("Enter board width: ");
+		int width = Convert.ToInt32( Console.ReadLine() );
+		Console.Write("Enter board height: ");
+		int height = Convert.ToInt32( Console.ReadLine() );
+		string[] names = new string[2];
+		Console.Write("Enter player 1 name: ");
+		names[0] = Console.ReadLine();
+		Console.Write("Enter player 2 name: ");
+		names[1] = Console.ReadLine();
+
+		Board board = new Board(width,height,names);
 		board.reset();
 		board.run();
 	}
