@@ -51,7 +51,7 @@ class Player {
 	}
 
 	public override string ToString() {
-		return "" + Name;
+		return "" + Name + " (" + Score + ")";
 	}
 }
 
@@ -135,29 +135,33 @@ class Board {
 		turn = 0;
 	}
 
-	private void flood(int x, int y, Tile current, Tile change) {
+	private int flood(int x, int y, Tile current, Tile change) {
 		if(x < 0) {
-			return;
+			return 0;
 		}
 		if(y < 0) {
-			return;
+			return 0;
 		}
 		if(x >= Width) {
-			return;
+			return 0;
 		}
 		if(y >= Height) {
-			return;
+			return 0;
 		}
 
 		if(tiles[x][y] != current) {
-			return;
+			return 0;
 		}
 
+		int captured = 1;
 		tiles[x][y] = change;
-		flood(x-1, y, current, change);
-		flood(x, y-1, current, change);
-		flood(x+1, y, current, change);
-		flood(x, y+1, current, change);
+
+		captured += flood(x-1, y, current, change);
+		captured += flood(x, y-1, current, change);
+		captured += flood(x+1, y, current, change);
+		captured += flood(x, y+1, current, change);
+
+		return captured;
 	}
 
 	private bool play(char action) {
@@ -187,10 +191,10 @@ class Board {
 
 		switch(turn % players.Length) {
 		case 0:
-			flood(0, 0, tiles[0][0], change);
+			players[0].Score = flood(0, 0, tiles[0][0], change);
 			break;
 		case 1:
-			flood(Width-1, Height-1, tiles[Width-1][Height-1], change);
+			players[1].Score = flood(Width-1, Height-1, tiles[Width-1][Height-1], change);
 			break;
 		}
 
